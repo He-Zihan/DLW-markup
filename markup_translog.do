@@ -29,6 +29,7 @@ gen km=k*m
 gen lmk=l*m*k
 gen l2k2m2=l2*k2*m2
 gen l3k3m3=l3*k3*m3
+
 *-----------------------------------------------------------*
 * OLS REGRESSION FOR STARTING VALUES
 xi:reg y l m k l2 m2 k2 lm lk km lmk i.industry i.year
@@ -37,6 +38,7 @@ qui gen OLSConst=_b[_c]
 //GMM initial value setting
 for any l m k l2 m2 k2 lm lk km lmk : qui gen initialX=OLSX
 qui gen initialConst=OLSConst
+
 *------FIRST STAGE USING EXP AS INPUT-----------------------*
 xtset id year
 xi: reg y l* m* k* i.industry i.year
@@ -45,6 +47,7 @@ predict epsilon, res
 label var phi "phi_it 
 label var epsilon "measurement error first stage
 gen phi_lag=L.phi
+
 *-------------------------------------------------------------*
 gen l_lag=L.l
 gen k_lag=L.k
@@ -59,10 +62,12 @@ gen l_lagm_lagk_lag=l_lag*m_lag*k_lag
 gen l_lagk=l_lag*k
 gen km_lag=k*m_lag
 gen l_lagm_lagk=l_lag*m_lag*k
+
 *--------------COMPUTE CORRECTED SHARES---------------------*
 gen y_c=y-epsilon
 gen va_c=exp(y_c)
 gen alpha_m=M/va_c
+
 *-----------------------------------------------------------------*
 drop _I*
 sort id year
@@ -117,6 +122,7 @@ void DLW_TRANSLOG()
 }
 
 end
+
 *------------------END MATA PROGRAM------------------*
 cap program drop dlw_translog
 program dlw_translog, rclass
@@ -124,8 +130,8 @@ preserve
 sort id year
 mata DLW_TRANSLOG()
 end
+
 *--------------COMPUTE MARKUPS -----------------------*
-// OLS, DLW estimates for variable input (here materials) are used to compute markup distribution
 *---------------------ACF estimates---------------------*
 dlw_translog
 gen betam_tl1=beta_dlwtranslog[1,3]
