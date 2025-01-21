@@ -1,6 +1,6 @@
 
 
-************************企业加成率的测算***************************
+************************MARKUP DLW***************************
 clear mata
 set mem 400m
 
@@ -31,11 +31,11 @@ gen lmk=l*m*k
 gen l2k2m2=l2*k2*m2
 gen l3k3m3=l3*k3*m3
 *-----------------------------------------------------------*
-* OLS REGRESSION FOR STARTING VALUES/OLS回归求出初始值
+* OLS REGRESSION FOR STARTING VALUES
 xi:reg y l m k l2 m2 k2 lm lk km lmk i.nace2 i.year
 for any l m k l2 m2 k2 lm lk km lmk : qui gen OLSX=_b[X]
 qui gen OLSConst=_b[_c]
-//GMM初始值设定
+//GMM initial value setting
 for any l m k l2 m2 k2 lm lk km lmk : qui gen initialX=OLSX
 qui gen initialConst=OLSConst
 *------FIRST STAGE USING EXP AS INPUT-----------------------*
@@ -76,15 +76,12 @@ drop if phi==.
 drop if phi_lag==.
 /* FOR SKETCH CODE BELOW WE USE AR1 PROCESS ON PRODUCTIVITY, IN PAPER WE USE POLYNOMIAL EXPANSION AND HAVE HIGHER ORDER TERMS IN OMEGA_LAG_POL */
 
-*--------------BEGIN MATA PROGRAM 矩估计-----------------------*
-*mata是矩阵运算，//是注释方法
-*mata 表示进入 Mata 
+*--------------BEGIN MATA PROGRAM -----------------------*
 *void  matrix()
- *betas系数矩阵，crit is the criterion function. g and H are the gradient and Hessian
- *st_data  gets the dep var "."，获得变量
+ *betas are matrices of coefficients，crit is the criterion function. g and H are the gradient and Hessian
+ *st_data  gets the dep var "."
  *st_data(., ("mpg", "weight")) returns the values of variables mpg and weight, all observations.
- *invsym(.)实对称矩阵的逆
-  * https://www.lianxh.cn/news/e23df70afde87.html
+ *invsym(.)is the inverse of the real symmetry matrix.
 mata:
 
 void GMM_DLW_TL(todo,betas,crit,g,H)
@@ -139,8 +136,8 @@ gen betakm_tl=beta_dlwtranslog[1,10]
 gen betalmk_tl=beta_dlwtranslog[1,11]
 gen betam_tl=betam_tl1+2*betam_tl2*m+betalm_tl*l+betakm_tl*k+betalmk_tl*l*k
 
-//顺序"const"1,"l"2,"m"3,"k"4,"l2"5,"m2"6,"k2"7,"lm"8,"lk"9,"km"10,"lmk"11
-*求出加成率
+//"const"1,"l"2,"m"3,"k"4,"l2"5,"m2"6,"k2"7,"lm"8,"lk"9,"km"10,"lmk"11
+*Calculate the markup
 gen Markup_DLWTL=betam_tl/alpha_m
 sum Markup_DLWTL
 
