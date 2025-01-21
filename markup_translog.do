@@ -141,7 +141,6 @@ gen betakm_tl=beta_dlwtranslog[1,10]
 gen betalmk_tl=beta_dlwtranslog[1,11]
 gen betam_tl=betam_tl1+2*betam_tl2*m+betalm_tl*l+betakm_tl*k+betalmk_tl*l*k
 
-//"const"1,"l"2,"m"3,"k"4,"l2"5,"m2"6,"k2"7,"lm"8,"lk"9,"km"10,"lmk"11
 *Calculate the markup
 gen Markup_DLWTL=betam_tl/alpha_m
 sum Markup_DLWTL
