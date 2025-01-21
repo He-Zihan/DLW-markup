@@ -32,7 +32,7 @@ gen l2k2m2=l2*k2*m2
 gen l3k3m3=l3*k3*m3
 *-----------------------------------------------------------*
 * OLS REGRESSION FOR STARTING VALUES
-xi:reg y l m k l2 m2 k2 lm lk km lmk i.nace2 i.year
+xi:reg y l m k l2 m2 k2 lm lk km lmk i.industry i.year
 for any l m k l2 m2 k2 lm lk km lmk : qui gen OLSX=_b[X]
 qui gen OLSConst=_b[_c]
 //GMM initial value setting
@@ -40,7 +40,7 @@ for any l m k l2 m2 k2 lm lk km lmk : qui gen initialX=OLSX
 qui gen initialConst=OLSConst
 *------FIRST STAGE USING EXP AS INPUT-----------------------*
 xtset id year
-xi: reg y l* m* k* i.nace2 i.year
+xi: reg y l* m* k* i.industry i.year
 predict phi
 predict epsilon, res
 label var phi "phi_it 
